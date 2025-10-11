@@ -17,33 +17,83 @@ git push -u origin main
 # Platforma de Monitorizare a Starii unui Sistem
 
 ## Scopul Proiectului
-- [Descriere detaliata a scopului proiectului. ]
+Această aplicație monitorizează starea unui sistem (mașină virtuală, container etc.) și salvează periodic informații relevante despre resursele utilizate. Datele sunt arhivate automat pentru analiză ulterioară. Proiectul este containerizat cu Docker, orchestrat cu Kubernetes, automatizat cu Ansible, integrat în pipeline-uri CI/CD cu Jenkins și susținut de infrastructură creată cu Terraform.
 
 ### Arhitectura proiectului
-Acest subpunct este BONUS.
-- [Desenati in excalidraw sau in orice tool doriti arhitectura generala a proiectului si includeti aici poza cu descrierea pasilor]
-
-- Acesta este un exemplu de inserare de imagine in README.MD. Puneti imagine in directorul de imagini si o inserati asa:
-
-![Jenkins Logo](imagini/jenkins-logo.png)
-
-Consultati si [Sintaxa Markdown](https://www.markdownguide.org/cheat-sheet/)
+platforma-monitorizare/
+├── ansible/
+│   ├── inventory.ini
+│   └── playbooks/
+│       ├── deploy_platform.yml
+│       └── install_docker.yml
+├── docker/
+│   ├── backup/
+│   │   └── Dockerfile
+│   ├── compose.yaml
+│   └── monitoring/
+│       └── Dockerfile
+├── imagini/
+│   └── jenkins-logo.png
+├── jenkins/
+│   └── pipelines/
+│       ├── backup/
+│       │   └── Jenkinsfile
+│       └── monitoring/
+│           └── Jenkinsfile
+├── k8s/
+│   ├── deployment.yaml
+│   └── hpa.yaml
+├── scripts/
+│   ├── backup.py
+│   └── monitoring.sh
+├── terraform/
+│   ├── backend.tf
+│   └── main.tf
+└── README.md
 
 ## Structura Proiectului
-[Aici descriem rolul fiecarui director al proiectului. Descrierea trebuie sa fie foarte pe scurt la acest pas. O sa intrati in detalii la pasii urmatori.]
-- `/scripts`: [Puneti aici ce rol are directorul de scripturi si ce face fiecare script]
-- `/docker`: [Descriere Dockerfiles și docker-compose.yml. Aici descrieti legatura dintre fiecare Dockerfile si scripturile de mai sus (vedeti comentariul din fiecare Dockerfile)]
-- `/ansible`: [Descriere rolurilor playbook-urilor și inventory]
-- `/jenkins`: [Descrierea rolului acestui director si a subdirectoarelor. Unde sunt folosite fisierele din acest subdirector.]
-- `/terraform`: [Descriere rol fiecare fisier Terraform folosit]
+- `/scripts`: 
+    - `monitoring.sh`: script shell care colectează date despre sistem (CPU, memorie, uptime, procese, disk).
+    - `backup.py`: script Python care face backup la fișierul de log dacă acesta s-a modificat
+
+- `/docker`: 
+    - `monitoring/Dockerfile`: imagine Docker pentru scriptul de monitorizare
+    - `backup/Dockerfile`: imagine Docker pentru scriptul de backup.
+    - `compose.yaml`: pornește ambele containere și le conectează prin volume comune.
+
+- `/k8s`:
+    - `deployment.yaml`: definește un pod cu 3 containere (monitor, backup, nginx).
+    - `hpa.yaml`: autoscaler pe baza CPU și memorie.
+
+- `/ansible`:
+    - `install_docker.yml`: instalează Docker pe o mașină virtuală.
+    - `deploy_platform.yml`: rulează aplicația folosind docker-compose.yaml.
+    - `inventory.ini`: definește VM-urile țintă
+
+- `/jenkins/pipelines`:
+    - `monitoring/Jenkinsfile`: pipeline CI/CD pentru scriptul shell.
+    - `backup/Jenkinsfile`: pipeline CI/CD pentru scriptul Python.
+
+- `/terraform`:
+    - `main.tf`: creează infrastructura AWS (EC2, S3, SSH key-pair).
+    - `backend.tf`: salvează state-ul Terraform în S3.
+
 
 ## Setup și Rulare
 - [Instrucțiuni de setup local și remote. Aici trebuiesc puse absolut toate informatiile necesare pentru a putea instala si rula proiectul. De exemplu listati aici si ce tool-uri trebuiesc instalate (Ansible, SSH config, useri, masini virtuale noi daca este cazul, etc) pasii de instal si comenzi].
 - [Cand includeti instructiuni folositi blocul de code markdown cu limbajul specific codului ]
 
+⚙️ Variabile de mediu
+| Variabilă         | Descriere                               | Valoare implicită | 
+| MONITOR_INTERVAL | Intervalul de monitorizare în secunde    |  5                | 
+| BACKUP_INTERVAL  | Intervalul de verificare pentru backu    |  5                | 
+| BACKUP_DIR       | Directorul unde se salvează backup-urile | backup            | 
+
+Se pot suprascrie cu:
 ```bash
-ls -al
-docker run my-app
+export MONITOR_INTERVAL=10
+export BACKUP_INTERVAL=10
+export BACKUP_DIR=/home/cris/work/platforma-monitorizare/backup
 ```
 
 ```python
