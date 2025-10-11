@@ -21,7 +21,7 @@ Această aplicație monitorizează starea unui sistem (mașină virtuală, conta
 
 ### Arhitectura proiectului
 
-!(/structura-proiect.png)
+![Structura proiectului](/home//cris/work/platforma-monitorizare/imagini/structura-proiect.png)
 
 platforma-monitorizare/
 ├── ansible/
