@@ -50,6 +50,7 @@ platforma-monitorizare/
 │   ├── backend.tf
 │   └── main.tf
 └── README.md
+!(/home/work/platoforma-monitorizare/imagini/structura-proiect.png)
 
 ## Structura Proiectului
 - `/scripts`: 
