@@ -84,10 +84,11 @@ platforma-monitorizare/
 - [Cand includeti instructiuni folositi blocul de code markdown cu limbajul specific codului ]
 
 ⚙️ Variabile de mediu
-| Variabilă         | Descriere                               | Valoare implicită | 
-| MONITOR_INTERVAL | Intervalul de monitorizare în secunde    |  5                | 
-| BACKUP_INTERVAL  | Intervalul de verificare pentru backu    |  5                | 
-| BACKUP_DIR       | Directorul unde se salvează backup-urile | backup            | 
+| Variabilă      | Descriere   | Valoare implicită                          |
+|:------------------|:--------:|-----------------------------------:|
+| MONITOR_INTERVAL     | Intervalul de monitorizare în secunde     | 5 |
+| BACKUP_INTERVAL      | ntervalul de verificare pentru backup   | 5     |
+| BACKUP_DIR         | irectorul unde se salvează backup-urile   | backup    |
 
 Se pot suprascrie cu:
 ```bash
