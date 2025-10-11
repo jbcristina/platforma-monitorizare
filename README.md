@@ -23,38 +23,6 @@ Această aplicație monitorizează starea unui sistem (mașină virtuală, conta
 
 ![Structura proiectului](/imagini/structura_proiect.png)
 
-platforma-monitorizare/
-├── ansible/
-│   ├── inventory.ini
-│   └── playbooks/
-│       ├── deploy_platform.yml
-│       └── install_docker.yml
-├── docker/
-│   ├── backup/
-│   │   └── Dockerfile
-│   ├── compose.yaml
-│   └── monitoring/
-│       └── Dockerfile
-├── imagini/
-│   └── jenkins-logo.png
-├── jenkins/
-│   └── pipelines/
-│       ├── backup/
-│       │   └── Jenkinsfile
-│       └── monitoring/
-│           └── Jenkinsfile
-├── k8s/
-│   ├── deployment.yaml
-│   └── hpa.yaml
-├── scripts/
-│   ├── backup.py
-│   └── monitoring.sh
-├── terraform/
-│   ├── backend.tf
-│   └── main.tf
-└── README.md
-
-
 ## Structura Proiectului
 - `/scripts`: 
     - `monitoring.sh`: script shell care colectează date despre sistem (CPU, memorie, uptime, procese, disk).
@@ -87,6 +55,17 @@ platforma-monitorizare/
 - [Instrucțiuni de setup local și remote. Aici trebuiesc puse absolut toate informatiile necesare pentru a putea instala si rula proiectul. De exemplu listati aici si ce tool-uri trebuiesc instalate (Ansible, SSH config, useri, masini virtuale noi daca este cazul, etc) pasii de instal si comenzi].
 - [Cand includeti instructiuni folositi blocul de code markdown cu limbajul specific codului ]
 
+🖥️ scripts/monitoring.sh
+- Suprascrie fișierul `system-state.log` la fiecare ciclu
+- Intervalul este configurabil cu `export MONITOR_INTERVAL=10`
+
+💾 scripts/backup.py
+- Creează backup doar dacă fișierul s-a modificat
+- Numele backup-ului include data și ora
+- Directorul de backup este configurabil cu `export BACKUP_DIR=backup`
+- Logurile sunt clare și informative
+- Tratează toate excepțiile fără a se opri
+
 ⚙️ Variabile de mediu
 | Variabilă      | Descriere   | Valoare implicită                          |
 |:------------------|:--------:|-----------------------------------:|
@@ -99,6 +78,18 @@ Se pot suprascrie cu:
 export MONITOR_INTERVAL=10
 export BACKUP_INTERVAL=10
 export BACKUP_DIR=/home/cris/work/platforma-monitorizare/backup
+```
+Recomandare de rulare:
+```bash
+# Rulare monitorizare
+cd /home/cris/work/platforma-monitorizare/scripts
+export MONITOR_INTERVAL=5
+bash monitoring.sh
+
+# Rulare backup
+export BACKUP_INTERVAL=5
+export BACKUP_DIR=/home/cris/work/platforma-monitorizare/backup
+python3 backup.py
 ```
 
 ```python
