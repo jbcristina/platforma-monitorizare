@@ -20,6 +20,9 @@ git push -u origin main
 Această aplicație monitorizează starea unui sistem (mașină virtuală, container etc.) și salvează periodic informații relevante despre resursele utilizate. Datele sunt arhivate automat pentru analiză ulterioară. Proiectul este containerizat cu Docker, orchestrat cu Kubernetes, automatizat cu Ansible, integrat în pipeline-uri CI/CD cu Jenkins și susținut de infrastructură creată cu Terraform.
 
 ### Arhitectura proiectului
+
+!(/structura-proiect.png)
+
 platforma-monitorizare/
 ├── ansible/
 │   ├── inventory.ini
@@ -50,7 +53,7 @@ platforma-monitorizare/
 │   ├── backend.tf
 │   └── main.tf
 └── README.md
-!(/home/work/platoforma-monitorizare/imagini/structura-proiect.png)
+
 
 ## Structura Proiectului
 - `/scripts`: 
