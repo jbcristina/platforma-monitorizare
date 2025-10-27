@@ -82,29 +82,117 @@ export BACKUP_DIR=/home/cris/work/platforma-monitorizare/backup
 Recomandare de rulare:
 ```bash
 # Rulare monitorizare
-cd /home/cris/work/platforma-monitorizare/scripts
+cd /home/cris/work/platforma-monitorizare
 export MONITOR_INTERVAL=5
-bash monitoring.sh
+bash scripts/monitoring.sh
 
 # Rulare backup
 export BACKUP_INTERVAL=5
 export BACKUP_DIR=/home/cris/work/platforma-monitorizare/backup
-python3 backup.py
+python3 scripts/backup.py
 ```
 
-```python
-import time
-print("Hello World")
-time.sleep(4)
+-> Crearea imaginilor Docker
+- Containerul de monitorizare:
+```bash
+# Build:
+cd /home/cris/work/platforma-monitorizare
+docker build -t monitorizare -f docker/monitoring/Dockerfile .
+#Testare individuala:
+docker run --rm -e MONITORING_INTERVAL=5 -v "$(pwd)/scripts:/scripts" monitorizare
+docker exec -it monitorizare sh
+```
+Se verifică fișierul scripts/system-state.log — ar trebui să fie suprascris la fiecare 5 secunde cu informații despre sistem.
+
+- Containerul de backup:
+```bash
+# Build:
+cd /home/cris/work/platforma-monitorizare
+docker build -t backup -f docker/backup/Dockerfile .
+#Testare individuala:
+docker run --rm -e INTERVAL=5 -e BACKUP_DIR=scripts/backup -e MAX_BACKUPS=10 -v "$(pwd)/scripts:/scripts" backup
+docker exec -it backup sh
+```
+Scriptul citește scripts/system-state.log.
+Dacă fișierul se modifică, creează backupuri în scripts/backup/.
+Păstrează maxim 10 fișiere (sau cât se seteaza prin MAX_BACKUPS).
+Logurile din terminal confirmă acțiunile: detectare modificare, creare backup, rotație fișiere
+
+- Rularea ambelor containere simultan cu Docker Compose:
+```bash
+# Build:
+cd /home/cris/work/platforma-monitorizare
+docker compose -f docker/compose.yaml up --build
+#Verificare loguri:
+Attaching to backup, monitorizare
+backup  | 2025-10-27 19:54:55,155 - INFO - Pornit script de backup cu interval de 5 secunde.
+backup  | 2025-10-27 19:54:55,155 - INFO - Pornit script de backup cu interval de 5 secunde.
+backup  | 2025-10-27 19:54:55,157 - INFO - Fișierul s-a modificat. Se face backup...
+backup  | 2025-10-27 19:54:55,157 - INFO - Backup creat: scripts/backup/system-state_20251027_195455.log
+backup  | 2025-10-27 19:54:55,157 - INFO - Fișierul s-a modificat. Se face backup...
+backup  | 2025-10-27 19:54:55,157 - INFO - Backup creat: scripts/backup/system-state_20251027_195455.log
+
+backup  | 2025-10-27 19:54:55,158 - INFO - Backup vechi șters: scripts/backup/system-state_20251027_184435.log
+backup  | 2025-10-27 19:55:00,164 - INFO - Fișierul s-a modificat. Se face backup...
+#Într-un alt terminal:
+docker exec -it backup sh
+/ # tail -f scripts/system-state.log
+/ # ls -l scripts/backup/
+```
+🔎 Se verifică că:
+- system-state.log este actualizat periodic
+- fișierele de backup apar în scripts/backup/
+- se păstrează maxim 10 backupuri (sau cât este setat în MAX_BACKUPS)
+
+- Oprirea containerelor și curățare imagini și volume:
+```bash
+docker compose -f docker/compose.yaml down
+docker system prune -a
 ```
 
-- [Descrieti cum ati pornit containerele si cum ati verificat ca aplicatia ruleaza corect.] 
+
+
 - [Includeti aici pasii detaliati de configurat si rulat Ansible pe masina noua]
 - [Descrieti cum verificam ca totul a rulat cu succes? Cateva comenzi prin care verificam ca Ansible a instalat ce trebuia]
 
 ## Setup și Rulare in Kubernetes
 - [Adaugati aici cateva detalii despre cum se poate rula in Kubernetes aplicatia]
 - [Bonus: Adaugati si o diagrama cu containerele si setupul de Kubernetes] 
+
+flowchart TB
+    subgraph NS["🧭 Namespace: monitoring"]
+        subgraph DEP["🔁 Deployment: monitoring-app\nReplicas: 2"]
+            POD1["🧱 Pod #1"]
+            POD2["🧱 Pod #2"]
+        end
+    end
+
+    POD1 --> C1["Container: monitorizare\n🖥️ Rulează monitoring.sh\n📝 Scrie system-state.log"]
+    POD1 --> C2["Container: backup\n📦 Rulează backup.py\n🔄 Creează backup-uri"]
+    POD1 --> C3["Container: nginx\n🌐 Servește system-state.log pe HTTP:80"]
+    POD1 --> VOL["📂 Volume: shared-logs (emptyDir)\nPartajat între containere"]
+
+    POD2 --> C1b["Container: monitorizare"]
+    POD2 --> C2b["Container: backup"]
+    POD2 --> C3b["Container: nginx"]
+    POD2 --> VOLb["📂 shared-logs (emptyDir)"]
+
+    subgraph HPA["📈 HPA: monitoring-hpa"]
+        HPA1["Target: Deployment monitoring-app"]
+        HPA2["Min replicas: 2"]
+        HPA3["Max replicas: 10"]
+        HPA4["Metrics: CPU & Memory"]
+    end
+
+    subgraph ACCESS["🌐 Acces extern"]
+        A1["kubectl port-forward"]
+        A2["Service: NodePort / LoadBalancer"]
+        A3["Ingress: acces prin domeniu"]
+    end
+
+    HPA --> DEP
+    C3 --> ACCESS
+
 
 ## CI/CD și Automatizari
 - [Descriere pipeline-uri Jenkins. Puneti aici cat mai detaliat ce face fiecare pipeline de jenkins cu poze facute la pipeline in Blue Ocean. Detaliati cat puteti de mult procesul de CI/CD folosit.]
