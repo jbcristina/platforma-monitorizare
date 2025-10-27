@@ -157,6 +157,28 @@ docker system prune -a
 
 ## Setup și Rulare in Kubernetes
 - [Adaugati aici cateva detalii despre cum se poate rula in Kubernetes aplicatia]
+🔹 Build imagini local în Minikube:
+```bash
+minikube start
+eval $(minikube docker-env) #activeaza mediul Docker din Minikube
+docker build -t monitorizare -f docker/monitoring/Dockerfile .
+docker build -t backup -f docker/backup/Dockerfile .
+#Imaginile sunt disponibile in contextul Minikube
+```
+🔹 Aplică resursele Kubernetes:
+```bash
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/hpa.yaml
+```
+🔍 Verificare:
+```bash
+kubectl get pods -n monitoring
+kubectl get hpa -n monitoring
+kubectl port-forward -n monitoring deployment/monitoring-app 8888:80
+```
+Se acceseaza in browser: 
+http://localhost:8888/system-state.log
+
 - [Bonus: Adaugati si o diagrama cu containerele si setupul de Kubernetes] 
 
 flowchart TB
