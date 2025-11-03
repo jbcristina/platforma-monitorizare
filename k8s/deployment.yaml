@@ -1,1 +1,58 @@
 # Puneti aici tot ce aveti nevoie pentru deployment (Namespace, pods, volumes, etc)
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: monitoring
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: monitoring-app
+  namespace: monitoring
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: monitoring-app
+  template:
+    metadata:
+      labels:
+        app: monitoring-app
+    spec:
+      containers:
+        - name: monitorizare
+          image: monitorizare:latest
+          imagePullPolicy: Never
+          env:
+            - name: MONITORING_INTERVAL
+              value: "5"
+          volumeMounts:
+            - name: shared-logs
+              mountPath: /scripts
+
+        - name: backup
+          image: backup:latest
+          imagePullPolicy: Never
+          env:
+            - name: INTERVAL
+              value: "5"
+            - name: BACKUP_DIR
+              value: scripts/backup
+            - name: MAX_BACKUPS
+              value: "10"
+          volumeMounts:
+            - name: shared-logs
+              mountPath: /scripts
+
+        - name: nginx
+          image: nginx:alpine
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: shared-logs
+              mountPath: /usr/share/nginx/html
+      volumes:
+        - name: shared-logs
+          emptyDir: {}

@@ -1,1 +1,45 @@
 # Playbook Ansible pentru instalarea Docker pe server.
+---
+- name: Instalează Docker pe mașina nouă
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Actualizează pachetele
+      apt:
+        update_cache: yes
+
+    - name: Instalează dependințe pentru Docker
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg
+          - lsb-release
+        state: present
+
+    - name: Adaugă cheia GPG Docker
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Adaugă repository Docker
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+        state: present
+
+    - name: Instalează Docker
+      apt:
+        name: docker-ce
+        state: present
+        update_cache: yes
+
+    - name: Verifică instalarea Docker
+      command: docker --version
+      register: docker_version
+      changed_when: false
+
+    - name: Afișează versiunea Docker
+      debug:
+        msg: "Docker instalat: {{ docker_version.stdout }}"

@@ -1,1 +1,35 @@
 # Configurație pentru rularea ambelor containere Docker.
+version: '3.8'
+
+services:
+  monitorizare:
+    build:
+      context: ../
+      dockerfile: docker/monitoring/Dockerfile
+    container_name: monitorizare
+    environment:
+      - MONITORING_INTERVAL=5
+    volumes:
+      - ../scripts:/scripts
+    networks:
+      - monitor-net
+    restart: unless-stopped
+
+  backup:
+    build:
+      context: ../
+      dockerfile: docker/backup/Dockerfile
+    container_name: backup
+    environment:
+      - INTERVAL=5
+      - BACKUP_DIR=scripts/backup
+      - MAX_BACKUPS=10
+    volumes:
+      - ../scripts:/scripts
+    networks:
+      - monitor-net
+    restart: unless-stopped
+
+networks:
+  monitor-net:
+    driver: bridge

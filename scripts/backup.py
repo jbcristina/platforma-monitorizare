@@ -11,46 +11,54 @@ import os
 import time
 import shutil
 import hashlib
+import logging
 from datetime import datetime
+
+# Configurare logger
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger(__name__)
 
 # Configurații din variabile de mediu
 INTERVAL = int(os.getenv("INTERVAL", 5))
-BACKUP_DIR = os.getenv("BACKUP_DIR", "/home/cris/work/platforma-monitorizare/backup")
+BACKUP_DIR = os.getenv("BACKUP_DIR", "scripts/backup")
 MAX_BACKUPS = int(os.getenv("MAX_BACKUPS", 10))
-SOURCE_FILE = "system-state.log"
+SOURCE_FILE = "scripts/system-state.log"
 
 # Asigură existența directorului de backup
 try:
     os.makedirs(BACKUP_DIR, exist_ok=True)
 except Exception as e:
-    print(f"[ERROR] Nu s-a putut crea directorul de backup: {e}")
+    logger.error(f"Nu s-a putut crea directorul de backup: {e}")
 
-print(f"[INFO] Pornit script de backup cu interval de {INTERVAL} secunde.")
+logger.info(f"Pornit script de backup cu interval de {INTERVAL} secunde.")
 last_hash = None
 
 while True:
     try:
         if not os.path.exists(SOURCE_FILE):
-            print(f"[WARN] Fișierul sursă '{SOURCE_FILE}' nu există.")
+            logger.warning(f"Fișierul sursă '{SOURCE_FILE}' nu există.")
         else:
             try:
                 with open(SOURCE_FILE, "rb") as f:
                     current_hash = hashlib.sha256(f.read()).hexdigest()
             except Exception as e:
-                print(f"[WARN] Nu s-a putut calcula hash-ul fișierului: {e}")
+                logger.warning(f"Nu s-a putut calcula hash-ul fișierului: {e}")
                 current_hash = None
 
             if current_hash and current_hash != last_hash:
-                print("[INFO] Fișierul s-a modificat. Se face backup...")
+                logger.info("Fișierul s-a modificat. Se face backup...")
                 timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
                 backup_name = f"system-state_{timestamp}.log"
                 backup_path = os.path.join(BACKUP_DIR, backup_name)
                 try:
                     shutil.copy2(SOURCE_FILE, backup_path)
-                    print(f"[INFO] Backup creat: {backup_path}")
+                    logger.info(f"Backup creat: {backup_path}")
                     last_hash = current_hash
                 except Exception as e:
-                    print(f"[ERROR] Eroare la crearea backup-ului: {e}")
+                    logger.error(f"Eroare la crearea backup-ului: {e}")
 
                 # Rotație backupuri
                 try:
@@ -62,12 +70,12 @@ while True:
                         for old_file in backups[:len(backups) - MAX_BACKUPS]:
                             old_path = os.path.join(BACKUP_DIR, old_file)
                             os.remove(old_path)
-                            print(f"[INFO] Backup vechi șters: {old_path}")
+                            logger.info(f"Backup vechi șters: {old_path}")
                 except Exception as e:
-                    print(f"[WARN] Eroare la rotația backupurilor: {e}")
+                    logger.warning(f"Eroare la rotația backupurilor: {e}")
             else:
-                print("[INFO] Fișierul nu s-a modificat. Nu se face backup.")
+                logger.info("Fișierul nu s-a modificat. Nu se face backup.")
     except Exception as e:
-        print(f"[ERROR] Eroare neașteptată: {e}")
+        logger.error(f"Eroare neașteptată: {e}")
     time.sleep(INTERVAL)
 

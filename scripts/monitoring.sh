@@ -12,11 +12,11 @@
 # Setarea intervalului de timp pentru monitorizare
 INTERVAL=${MONITORING_INTERVAL:-5} 
 # Fișierul de log
-LOG_FILE="system-state.log" 
+LOG_FILE="scripts/system-state.log" 
 # Funcția pentru obținerea informațiilor de sistem
 get_system_info() {
-        echo "==================== STARE SISTEM ===================="
-        echo "Data: $(date '+%Y-%m-%d %H:%M:%S')"
+        echo "==================== STAREA SISTEMULUI ===================="
+        echo "Data si ora: $(date '+%Y-%m-%d %H:%M:%S')"
         echo "Hostname: $(hostname)"
         echo "Uptime: $(uptime -p)"
         echo "----------------------------------------"
@@ -49,7 +49,11 @@ get_system_info() {
         who | awk '{print "  User: " $1 ", Terminal: " $2 ", Login Time: " $3 " " $4}'
         echo "----------------------------------------"
         echo "Servicii active (systemd):"
-        systemctl list-units --type=service --state=running | awk 'NR>1 && NF {print "  " $1}'
+        if command -v systemctl >/dev/null 2>&1; then
+            systemctl list-units --type=service --state=running | awk 'NR>1 && NF {print "  " $1}'
+        else
+            echo "  systemctl nu este disponibil în acest mediu."
+        fi
         echo "====================================================="
 }   
 # Loop pentru monitorizare

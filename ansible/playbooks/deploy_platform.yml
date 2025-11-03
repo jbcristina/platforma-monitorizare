@@ -1,1 +1,95 @@
 # Playbook Ansible pentru rularea platformei Docker folosind docker-compose.
+---
+- name: Copiază și rulează platforma de monitorizare cu Docker Compose
+  hosts: all
+  become: true
+
+  vars:
+    remote_project_path: "/home/ansible/platforma-monitorizare"
+    compose_folder: "{{ remote_project_path }}/docker"
+    compose_file: "{{ compose_folder }}/compose.yaml"
+    backup_dir: "{{ remote_project_path }}/scripts/backup"
+
+  tasks:
+    - name: Creează directorul principal dacă nu există
+      file:
+        path: "{{ remote_project_path }}"
+        state: directory
+        owner: ansible
+        mode: '0755'
+
+    - name: Copiază proiectul local pe mașina remote
+      synchronize:
+        src: "{{ inventory_dir }}/../"
+        dest: "{{ remote_project_path }}"
+        recursive: yes
+        delete: no
+        rsync_opts:
+          - "--exclude=.git"
+          - "--exclude=__pycache__"
+          - "--exclude=*.pyc"
+      delegate_to: localhost
+      become: false
+
+    - name: Creează folderul scripts/backup dacă nu există
+      file:
+        path: "{{ backup_dir }}"
+        state: directory
+        owner: ansible
+        mode: '0755'
+
+    - name: Verifică dacă folderul docker există
+      stat:
+        path: "{{ compose_folder }}"
+      register: docker_folder_check
+
+    - name: Oprește execuția dacă folderul docker nu există
+      fail:
+        msg: "Folderul {{ compose_folder }} nu există pe mașina remote. Verifică structura locală și sincronizarea."
+      when: not docker_folder_check.stat.exists
+
+    - name: Rulează docker compose up
+      command: docker compose -f "{{ compose_file }}" up -d
+      args:
+        chdir: "{{ compose_folder }}"
+
+    - name: Verifică dacă containerul monitorizare rulează
+      shell: docker ps --filter "name=monitorizare" --format "{{ '{{' }}.Names{{ '}}' }}"
+      register: monitor_status
+      changed_when: false
+
+    - name: Verifică dacă containerul backup rulează
+      shell: docker ps --filter "name=backup" --format "{{ '{{' }}.Names{{ '}}' }}"
+      register: backup_status
+      changed_when: false
+
+    - name: Afișează statusul containerelor
+      debug:
+        msg:
+          - "Container monitorizare: {{ monitor_status.stdout | default('NU rulează') }}"
+          - "Container backup: {{ backup_status.stdout | default('NU rulează') }}"
+
+    - name: Așteaptă 10 secunde pentru generarea backupului
+      pause:
+        seconds: 10
+    
+    - name: Caută fișierele de backup în scripts/backup
+      find:
+        paths: "{{ backup_dir }}"
+        patterns: "system-state_*.log"
+        recurse: no
+      register: backup_files
+
+    - name: Verifică dacă există fișiere de backup
+      set_fact:
+        backup_detectat: "{{ backup_files.files | length > 0 }}"
+
+    - name: Afișează fișierele de backup găsite
+      debug:
+        msg: >-
+          {% if backup_detectat %}
+            Backupuri detectate în scripts/backup:
+            {{ backup_files.files | map(attribute='path') | list }}
+          {% else %}
+            Nu s-au detectat fișiere de backup în scripts/backup.
+          {% endif %}
