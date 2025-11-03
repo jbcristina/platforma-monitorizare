@@ -150,9 +150,47 @@ docker compose -f docker/compose.yaml down
 docker system prune -a
 ```
 
-
-
 - [Includeti aici pasii detaliati de configurat si rulat Ansible pe masina noua]
+```bash
+#Pe masina client citim cheia publica a userului curent:
+cat ~/.ssh/id_rsa.pub
+
+# Pe masina remote (masina noua) adaugam un user nou si ii setam cheia de ssh
+sudo adduser monitoring-user
+
+# Adaugam userul monitoring-user in userii cu drept de sudo
+sudo usermod -aG sudo monitoring-user
+groups monitoring-user
+
+# Adaugam userul de monitoring-user in lista de useri ce nu au nevoie de parola la sudo
+cd /etc/sudoers.d/
+echo "monitoring-user ALL=(ALL) NOPASSWD:ALL" | sudo tee monitoring-user-nopasswd
+# (monitoring-user este userul pe care il foloseste Ansible sa faca ssh pe masina server)
+
+su - monitoring-user
+
+# Verificam ca putem face sudo fara parola
+sudo ls
+
+# Adaugam cheia de ssh a userului monitoring-user in masina remote. Atentie: trebuie sa fiti logati cu userul monitoring-user cand rulati aceste comenzi
+
+mkdir .ssh
+touch ~/.ssh/authorized_keys
+echo “cheie ssh publica de pe masina client” >> ~/.ssh/authorized_keys
+cat ~/.ssh/authorized_keys
+
+# Install ssh server pe masina remote
+sudo apt update
+sudo apt install -y openssh-server
+service ssh status
+
+# Luam IP-ul masinii remote (IP-ul care nu se termina in .1)
+ip addr | grep 192.168
+
+# revenim pe masina client si incercam sa facem ssh cu userul monitoring-user
+ssh monitoring-user@192.168.2.126
+
+```
 - [Descrieti cum verificam ca totul a rulat cu succes? Cateva comenzi prin care verificam ca Ansible a instalat ce trebuia]
 
 ## Setup și Rulare in Kubernetes
