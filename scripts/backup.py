@@ -1,11 +1,4 @@
 # Script Python pentru efectuarea backup-ului logurilor de sistem.
-# ○	Un script python ce face backup la fișierul system-state.log
-# ■	Backup-ul trebuie să fie făcut doar dacă fișierul s-a modificat.
-# ■	Perioada la care se face backup este primită ca variabilă de mediu cu valoarea implicită 5 secunde.
-# ■	Fișierul de backup trebuie să conțină în nume și data la care a fost efectuat backup-ul.
-# ■	Directorul în care se fac backup-urile este primit ca variabilă de mediu cu valoare implicită backup.
-# ■	Scriptul trebuie să printeze loguri relevante și suficiente pentru investigarea unei eventuale erori. 
-# ■	Scriptul trebuie să trateze toate cazurile de excepție și să nu se termine cu eroare.
 
 import os
 import time
