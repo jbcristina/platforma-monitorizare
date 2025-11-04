@@ -3,41 +3,27 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = 'jbcristina/docker-bash-app'
-        DOCKERHUB_CREDENTIALS = 'dockerhub-cred-id'
+        IMAGE_NAME = "jbcristina/bash-deploy"
+        DOCKER_CREDENTIALS_ID = "dockerhub-cred-id"
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $DOCKER_IMAGE .'
+                sh 'docker build -t $IMAGE_NAME -f Dockerfile.bash .'
             }
         }
 
-        stage('Push to Docker Hub') {
+        stage('Deploy') {
             steps {
-                withCredentials([usernamePassword(credentialsId: DOCKERHUB_CREDENTIALS, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    sh """
-                        echo $PASSWORD | docker login -u $USERNAME --password-stdin
-                        docker push $DOCKER_IMAGE
-                    """
-                }
+                sh 'docker run -d --name bash-runner $IMAGE_NAME'
             }
         }
+    }
 
-        stage('Deploy to Minikube') {
-            steps {
-                sh '''
-                    kubectl config use-context minikube
-                    kubectl apply -f deployment.yaml
-                '''
-            }
+    post {
+        failure {
+            echo '❌ Deploy eșuat. Verifică logurile.'
         }
     }
 }
