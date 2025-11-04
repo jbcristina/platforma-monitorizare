@@ -28,6 +28,7 @@ pipeline {
             steps {
                 sh '''
                     pip install pytest --break-system-packages
+                    export PATH=$PATH:~/.local/bin
                     pytest tests/test_backup.py
                 '''
             }
