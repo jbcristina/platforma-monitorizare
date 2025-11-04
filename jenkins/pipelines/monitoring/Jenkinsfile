@@ -4,7 +4,6 @@ pipeline {
 
     environment {
         IMAGE_NAME = "jbcristina/bash-deploy"
-        DOCKER_CREDENTIALS_ID = "dockerhub-cred-id"
     }
 
     stages {
@@ -22,6 +21,9 @@ pipeline {
     }
 
     post {
+        success {
+            echo '✅ Deploy finalizat cu succes!'
+        }
         failure {
             echo '❌ Deploy eșuat. Verifică logurile.'
         }
