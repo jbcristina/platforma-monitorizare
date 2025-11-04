@@ -38,7 +38,9 @@ while True:
                 with open(SOURCE_FILE, "rb") as f:
                     current_hash = hashlib.sha256(f.read()).hexdigest()
             except Exception as e:
-                logger.warning(f"Nu s-a putut calcula hash-ul fișierului: {e}")
+                logger.warning(
+                    f"Nu s-a putut calcula hash-ul fișierului: {e}"
+                )
                 current_hash = None
 
             if current_hash and current_hash != last_hash:
@@ -56,8 +58,13 @@ while True:
                 # Rotație backupuri
                 try:
                     backups = sorted(
-                        (f for f in os.listdir(BACKUP_DIR) if f.startswith("system-state_")),
-                        key=lambda f: os.path.getmtime(f"{BACKUP_DIR}/{f}")
+                        (
+                            f for f in os.listdir(BACKUP_DIR)
+                            if f.startswith("system-state_")
+                        ),
+                        key=lambda f: os.path.getmtime(
+                            os.path.join(BACKUP_DIR, f)
+                        )
                     )
                     if len(backups) > MAX_BACKUPS:
                         for old_file in backups[:len(backups) - MAX_BACKUPS]:
@@ -65,10 +72,11 @@ while True:
                             os.remove(old_path)
                             logger.info(f"Backup vechi șters: {old_path}")
                 except Exception as e:
-                    logger.warning(f"Eroare la rotația backupurilor: {e}")
+                    logger.warning(
+                        f"Eroare la rotația backupurilor: {e}"
+                    )
             else:
                 logger.info("Fișierul nu s-a modificat. Nu se face backup.")
     except Exception as e:
         logger.error(f"Eroare neașteptată: {e}")
     time.sleep(INTERVAL)
-    
