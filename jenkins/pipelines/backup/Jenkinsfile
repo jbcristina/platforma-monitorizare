@@ -5,7 +5,7 @@ pipeline {
     environment {
         IMAGE_NAME = "cristina/backup"
         TAG = "latest"
-        DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-cred-id')
     }
 
     stages {
