@@ -17,7 +17,7 @@ pipeline {
             steps {
                 sh '''
                     docker rm -f bash-runner || true
-                    ddocker run -d --name bash-runner $IMAGE_NAME
+                    docker run -d --name bash-runner $IMAGE_NAME
                 '''
             }
         }
