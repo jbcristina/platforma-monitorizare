@@ -1,1 +1,61 @@
-# Pipeline Jenkins pentru CI/CD al scriptului python de backup.
+// Pipeline Jenkins pentru CI/CD al scriptului python de backup.
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_NAME = "cristina/backup"
+        TAG = "latest"
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-creds')
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Lint') {
+            steps {
+                sh '''
+                    pip install flake8 --break-system-packages
+                    flake8 scripts/backup.py
+                '''
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh '''
+                    pip install pytest --break-system-packages
+                    pytest tests/test_backup.py
+                '''
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t $IMAGE_NAME:$TAG -f docker/backup/Dockerfile .'
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                script {
+                    docker.withRegistry('', DOCKERHUB_CREDENTIALS) {
+                        sh 'docker push $IMAGE_NAME:$TAG'
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ CI/CD pentru backup.py finalizat cu succes!'
+        }
+        failure {
+            echo '❌ Eroare în pipeline. Verifică etapele.'
+        }
+    }
+}
