@@ -1,1 +1,43 @@
-# Pipeline Jenkins pentru CI/CD al scriptului Python.
+// Pipeline Jenkins pentru CI/CD al scriptului bash.
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_IMAGE = 'jbcristina/docker-bash-app'
+        DOCKERHUB_CREDENTIALS = 'dockerhub-cred-id'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'docker build -t $DOCKER_IMAGE .'
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: DOCKERHUB_CREDENTIALS, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    sh """
+                        echo $PASSWORD | docker login -u $USERNAME --password-stdin
+                        docker push $DOCKER_IMAGE
+                    """
+                }
+            }
+        }
+
+        stage('Deploy to Minikube') {
+            steps {
+                sh '''
+                    kubectl config use-context minikube
+                    kubectl apply -f deployment.yaml
+                '''
+            }
+        }
+    }
+}
