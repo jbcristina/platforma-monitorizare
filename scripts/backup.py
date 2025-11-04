@@ -56,8 +56,8 @@ while True:
                 # Rotație backupuri
                 try:
                     backups = sorted(
-                        [f for f in os.listdir(BACKUP_DIR) if f.startswith("system-state_")],
-                        key=lambda x: os.path.getmtime(os.path.join(BACKUP_DIR, x))
+                        (f for f in os.listdir(BACKUP_DIR) if f.startswith("system-state_")),
+                        key=lambda f: os.path.getmtime(f"{BACKUP_DIR}/{f}")
                     )
                     if len(backups) > MAX_BACKUPS:
                         for old_file in backups[:len(backups) - MAX_BACKUPS]:
@@ -71,4 +71,3 @@ while True:
     except Exception as e:
         logger.error(f"Eroare neașteptată: {e}")
     time.sleep(INTERVAL)
-
