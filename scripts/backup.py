@@ -71,3 +71,4 @@ while True:
     except Exception as e:
         logger.error(f"Eroare neașteptată: {e}")
     time.sleep(INTERVAL)
+    
