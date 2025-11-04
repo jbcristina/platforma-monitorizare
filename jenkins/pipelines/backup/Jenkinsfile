@@ -19,7 +19,7 @@ pipeline {
             steps {
                 sh '''
                     pip install flake8 --break-system-packages
-                    flake8 scripts/backup.py
+                    ~/.local/bin/flake8 scripts/backup.py
                 '''
             }
         }
