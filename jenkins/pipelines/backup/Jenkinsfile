@@ -5,7 +5,7 @@ pipeline {
     environment {
         IMAGE_NAME = "jbcristina/backup"
         TAG = "latest"
-        DOCKERHUB_CREDENTIALS = 'dockerhub-cred-id'
+        DOCKERHUB_CREDENTIALS = "dockerhub-cred-id"
     }
 
     stages {
@@ -39,16 +39,6 @@ pipeline {
                 sh 'docker build -t $IMAGE_NAME:$TAG -f docker/backup/Dockerfile .'
             }
         }
-        stage('Push to Docker Hub') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: DOCKERHUB_CREDENTIALS, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                    sh """
-                        echo $PASSWORD | docker login -u $USERNAME --password-stdin
-                        docker push $DOCKER_IMAGE
-                    """
-                }
-            }
-
     }
 
     post {
