@@ -1,29 +1,24 @@
-**Acest schelet de proiect si acest README.MD sunt orientative.** 
-**Aveti libertatea de a aduga alte fisiere si a modifica acest schelet cum doriti. Important este sa implementati proiectul conform cerintelor primite.**
-**Acest text si tot textul ajutator de mai jos trebuiesc sterse inainte de a preda proiectul.**
 
-**Pentru a clona acest proiect creati propriul vostru proiect EMPTY in gihub si rulati:**
-```bash
-git clone git@github.com:amihai/platforma-monitorizare.git
-cd platforma-monitorizar
-git remote -v
-git remote remove origin
-git remote add origin:<USERUL_VOSTRU>/platforma-monitorizare.git
-git branch -M main
-git push -u origin main
-```
-
-
-# Platforma de Monitorizare a Starii unui Sistem
+# 🛠️ Platforma de Monitorizare a Starii unui Sistem
 
 ## Scopul Proiectului
-Această aplicație monitorizează starea unui sistem (mașină virtuală, container etc.) și salvează periodic informații relevante despre resursele utilizate. Datele sunt arhivate automat pentru analiză ulterioară. Proiectul este containerizat cu Docker, orchestrat cu Kubernetes, automatizat cu Ansible, integrat în pipeline-uri CI/CD cu Jenkins și susținut de infrastructură creată cu Terraform.
+Scopul acestui proiect este să monitorizeze în timp real starea unui sistem (mașină virtuală, container etc.) și să mențină o istorie a stărilor pentru analiză ulterioară. Aplicația colectează informații despre CPU, memorie, procese active, utilizare disk și alte date relevante, le salvează într-un fișier de log, iar un script Python face backup automat doar când apar modificări. Totul este containerizat, orchestrat în Kubernetes, automatizat cu Ansible și Terraform, și integrat într-un pipeline CI/CD cu Jenkins.
 
 ### Arhitectura proiectului
+Arhitectura include:
+- Două containere: unul pentru monitorizare (shell), altul pentru backup (Python)
+- Un container Nginx care expune fișierul de log
+- Orchestrare în Kubernetes cu HPA
+- Provisionare cu Ansible pe o mașină virtuală
+- Infrastructură creată cu Terraform (EC2, S3, SSH key)
+- CI/CD cu Jenkins și Docker Hub
+
+
+
+## Structura Proiectului
 
 ![Structura proiectului](/imagini/structura_proiect.png)
 
-## Structura Proiectului
 - `/scripts`: 
     - `monitoring.sh`: script shell care colectează date despre sistem (CPU, memorie, uptime, procese, disk).
     - `backup.py`: script Python care face backup la fișierul de log dacă acesta s-a modificat
@@ -52,8 +47,6 @@ Această aplicație monitorizează starea unui sistem (mașină virtuală, conta
 
 
 ## Setup și Rulare
-- [Instrucțiuni de setup local și remote. Aici trebuiesc puse absolut toate informatiile necesare pentru a putea instala si rula proiectul. De exemplu listati aici si ce tool-uri trebuiesc instalate (Ansible, SSH config, useri, masini virtuale noi daca este cazul, etc) pasii de instal si comenzi].
-- [Cand includeti instructiuni folositi blocul de code markdown cu limbajul specific codului ]
 
 🖥️ scripts/monitoring.sh
 - Suprascrie fișierul `system-state.log` la fiecare ciclu
@@ -92,8 +85,9 @@ export BACKUP_DIR=/home/cris/work/platforma-monitorizare/backup
 python3 scripts/backup.py
 ```
 
--> Crearea imaginilor Docker
-- Containerul de monitorizare:
+## Setup și Rulare Docker
+
+### 1️⃣ Containerul de monitorizare:
 ```bash
 # Build:
 cd /home/cris/work/platforma-monitorizare
@@ -104,7 +98,7 @@ docker exec -it monitorizare sh
 ```
 Se verifică fișierul scripts/system-state.log — ar trebui să fie suprascris la fiecare 5 secunde cu informații despre sistem.
 
-- Containerul de backup:
+### 2️⃣  Containerul de backup:
 ```bash
 # Build:
 cd /home/cris/work/platforma-monitorizare
@@ -116,9 +110,9 @@ docker exec -it backup sh
 Scriptul citește scripts/system-state.log.
 Dacă fișierul se modifică, creează backupuri în scripts/backup/.
 Păstrează maxim 10 fișiere (sau cât se seteaza prin MAX_BACKUPS).
-Logurile din terminal confirmă acțiunile: detectare modificare, creare backup, rotație fișiere
+Logurile din terminal confirmă acțiunile: detectare modificare, creare backup, rotație fișiere.
 
-- Rularea ambelor containere simultan cu Docker Compose:
+### 3️⃣  Rularea ambelor containere simultan cu Docker Compose:
 ```bash
 # Build:
 cd /home/cris/work/platforma-monitorizare
@@ -144,58 +138,102 @@ docker exec -it backup sh
 - fișierele de backup apar în scripts/backup/
 - se păstrează maxim 10 backupuri (sau cât este setat în MAX_BACKUPS)
 
-- Oprirea containerelor și curățare imagini și volume:
+### ▶️ Oprirea containerelor și curățare imagini și volume:
 ```bash
 docker compose -f docker/compose.yaml down
 docker system prune -a
 ```
 
-- [Includeti aici pasii detaliati de configurat si rulat Ansible pe masina noua]
+## Setup și Rulare Ansible pe mașina nouă
 ```bash
-#Pe masina client citim cheia publica a userului curent:
+#Pe mașina client citim cheia publică a userului curent:
 cat ~/.ssh/id_rsa.pub
 
-# Pe masina remote (masina noua) adaugam un user nou si ii setam cheia de ssh
-sudo adduser monitoring-user
+# Pe mașina remote (mașina nouă) adăugăm un user nou și îi setăm cheia de ssh
+sudo adduser ansible2
 
-# Adaugam userul monitoring-user in userii cu drept de sudo
-sudo usermod -aG sudo monitoring-user
-groups monitoring-user
+# Adăugăm userul ansible2 în userii cu drept de sudo
+sudo usermod -aG sudo mansible2
+groups ansible2
 
-# Adaugam userul de monitoring-user in lista de useri ce nu au nevoie de parola la sudo
+# Adăugăm userul ansible2 în lista de useri ce nu au nevoie de parolă la sudo
 cd /etc/sudoers.d/
-echo "monitoring-user ALL=(ALL) NOPASSWD:ALL" | sudo tee monitoring-user-nopasswd
-# (monitoring-user este userul pe care il foloseste Ansible sa faca ssh pe masina server)
+echo "ansible2 ALL=(ALL) NOPASSWD:ALL" | sudo tee ansible2-nopasswd
+# (ansible2 este userul pe care îl folosește Ansible să facă ssh pe mașina server)
 
-su - monitoring-user
+su - ansible2
 
-# Verificam ca putem face sudo fara parola
+# Verificăm că putem face sudo fară parolă
 sudo ls
 
-# Adaugam cheia de ssh a userului monitoring-user in masina remote. Atentie: trebuie sa fiti logati cu userul monitoring-user cand rulati aceste comenzi
+# Adaugăm cheia de ssh a userului ansible2 în mașina remote. Atenție: trebuie sa fiți logati cu userul ansible când rulați aceste comenzi
 
 mkdir .ssh
 touch ~/.ssh/authorized_keys
 echo “cheie ssh publica de pe masina client” >> ~/.ssh/authorized_keys
 cat ~/.ssh/authorized_keys
 
-# Install ssh server pe masina remote
+# Instalăm ssh server pe mașina remote
 sudo apt update
 sudo apt install -y openssh-server
 service ssh status
 
-# Luam IP-ul masinii remote (IP-ul care nu se termina in .1)
+# Luam IP-ul mașinii remote (IP-ul care nu se termina in .1)
 ip addr | grep 192.168
 
-# revenim pe masina client si incercam sa facem ssh cu userul monitoring-user
-ssh monitoring-user@192.168.2.126
+# Revenim pe mașina client și încercăm să facem ssh cu userul ansible2
+ssh ansible2@192.168.2.126
 
 ```
-- [Descrieti cum verificam ca totul a rulat cu succes? Cateva comenzi prin care verificam ca Ansible a instalat ce trebuia]
+### ✅ Verificare instalare Docker cu Ansible
+După rularea playbook-ului `ansible/playbooks/install_docker.yml`, verifică:
+```bash
+ansible-playbook -i ansible/inventory.ini ansible/playbooks/install_docker.yml
+ansible-playbook -i ansible/inventory.ini ansible/playbooks/deploy_platform.yml
+# Verifică dacă Docker este instalat
+docker --version
+# Verifică dacă serviciul Docker rulează
+systemctl status docker
+# Verifică dacă userul are acces la Docker
+groups ansible2
+```
+Dacă ansible2 apare în grupul docker, instalarea este completă.
+
+### ✅ Verificare rulare compose.yaml cu Ansible
+După rularea playbook-ului `ansible/playbooks/deploy_platform.yml`, verifică:
+```bash
+# Verifică dacă fișierul compose a fost copiat
+ls -l /home/ansible2/compose.yaml
+
+# Verifică dacă containerele rulează
+docker ps
+
+# Verifică logurile containerelor
+docker logs <nume_container>
+```
+### ✅ Verificare funcționalitate aplicație:
+```bash
+# Verifică dacă fișierul system-state.log este generat
+cat scripts/system-state.log
+
+# Verifică dacă backup-ul a fost creat
+ls backup/
+```
+### 🔍 Verificare Ansible din output:
+În terminal, după rularea playbook-urilor, caută:
+- changed=1 sau ok=1 pentru taskuri reușite
+- failed=0 pentru a confirma că nu au fost erori
+Exemplu:
+```bash
+PLAY RECAP ***********************************************************************************************************************************************
+vm                         : ok=13   changed=4    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+
+```
+
 
 ## Setup și Rulare in Kubernetes
-- [Adaugati aici cateva detalii despre cum se poate rula in Kubernetes aplicatia]
-🔹 Build imagini local în Minikube:
+
+### 🔹 Build imagini local în Minikube:
 ```bash
 minikube start
 eval $(minikube docker-env) #activeaza mediul Docker din Minikube
@@ -203,12 +241,12 @@ docker build -t monitorizare -f docker/monitoring/Dockerfile .
 docker build -t backup -f docker/backup/Dockerfile .
 #Imaginile sunt disponibile in contextul Minikube
 ```
-🔹 Aplică resursele Kubernetes:
+### 🔹 Aplică resursele Kubernetes:
 ```bash
 kubectl apply -f k8s/deployment.yaml
 kubectl apply -f k8s/hpa.yaml
 ```
-🔍 Verificare:
+### 🔍 Verificare:
 ```bash
 kubectl get pods -n monitoring
 kubectl get hpa -n monitoring
@@ -217,48 +255,108 @@ kubectl port-forward -n monitoring deployment/monitoring-app 8888:80
 Se acceseaza in browser: 
 http://localhost:8888/system-state.log
 
-- [Bonus: Adaugati si o diagrama cu containerele si setupul de Kubernetes] 
+🖼️ Diagrama arhitecturii în Kubernetes
 
-flowchart TB
-    subgraph NS["🧭 Namespace: monitoring"]
-        subgraph DEP["🔁 Deployment: monitoring-app\nReplicas: 2"]
-            POD1["🧱 Pod #1"]
-            POD2["🧱 Pod #2"]
-        end
-    end
+          +--------------------+
+          |      User/Client   |
+          +---------+----------+
+                    |
+                    v
+          +--------------------+
+          |     Nginx Pod      |  <- Expune logurile
+          +---------+----------+
+                    |
+        +--------------+----------------+
+        |                               |
+        v                               v
+    +--------+                       +--------+ 
+    | Monitor|                       | Backup |
+    |Container|                      |Container|
+    +--------+                       +--------+
 
-    POD1 --> C1["Container: monitorizare\n🖥️ Rulează monitoring.sh\n📝 Scrie system-state.log"]
-    POD1 --> C2["Container: backup\n📦 Rulează backup.py\n🔄 Creează backup-uri"]
-    POD1 --> C3["Container: nginx\n🌐 Servește system-state.log pe HTTP:80"]
-    POD1 --> VOL["📂 Volume: shared-logs (emptyDir)\nPartajat între containere"]
+- HPA (Horizontal Pod Autoscaler) gestionează numărul de replici:   
+  minReplicas = 2, maxReplicas = 10
 
-    POD2 --> C1b["Container: monitorizare"]
-    POD2 --> C2b["Container: backup"]
-    POD2 --> C3b["Container: nginx"]
-    POD2 --> VOLb["📂 shared-logs (emptyDir)"]
-
-    subgraph HPA["📈 HPA: monitoring-hpa"]
-        HPA1["Target: Deployment monitoring-app"]
-        HPA2["Min replicas: 2"]
-        HPA3["Max replicas: 10"]
-        HPA4["Metrics: CPU & Memory"]
-    end
-
-    subgraph ACCESS["🌐 Acces extern"]
-        A1["kubectl port-forward"]
-        A2["Service: NodePort / LoadBalancer"]
-        A3["Ingress: acces prin domeniu"]
-    end
-
-    HPA --> DEP
-    C3 --> ACCESS
-
+Note:   
+Monitorul generează logul de sistem periodic.   
+Backup-ul verifică modificările și creează copii cu timestamp.  
+Nginx expune fișierul de log pentru vizualizare externă.    
+Autoscalarea se face automat pe baza metricilor CPU și memorie.
 
 ## CI/CD și Automatizari
-- [Descriere pipeline-uri Jenkins. Puneti aici cat mai detaliat ce face fiecare pipeline de jenkins cu poze facute la pipeline in Blue Ocean. Detaliati cat puteti de mult procesul de CI/CD folosit.]
-- [Detalii cu restul cerintelor de CI/CD (cum ati creat userul nou ce are access doar la resursele proiectului, cum ati creat un View now pentru proiect, etc)]
-- [Daca ati implementat si punctul E optional atunci detaliati si setupul de minikube.]
 
+Proiectul include două pipeline-uri declarative, fiecare definit într-un `Jenkinsfile` și versionat în Git:
+
+### 🔧 Pipeline-uri
+
+- `jenkins/pipelines/backup/Jenkinsfile`: verifică sintaxa, testează, construiește imaginea Docker și o publică
+- `jenkins/pipelines/monitoring/Jenkinsfile`: construiește imaginea Docker și o publică
+
+#### ⚙️ 1. Crearea joburilor în Jenkins
+##### 🔹 1.1. platforma-monitorizare-backup
+1. În Jenkins --> Dashboard --> New Item
+2. Nume: platforma-monitorizare-backup
+3. Tip: Pipeline
+4. Click OK
+5. La secțiunea Pipeline:
+
+	Definition: Pipeline script from SCM
+
+	SCM: Git
+
+	Repository URL: git@github.com:jbcristina/platforma-monitorizare.git
+
+	Credentials: jenkins
+
+	Branch: */main
+
+	Script Path: jenkins/pipelines/backup/Jenkinsfile
+6. Click Save și Build Now
+
+##### 🔹 1.2. platforma-monitorizare-monitoring
+1. În Jenkins --> Dashboard --> New Item
+2. Nume: platforma-monitorizare-monitoring
+3. Tip: Pipeline
+4. Click OK
+5. La secțiunea Pipeline:
+
+	Definition: Pipeline script from SCM
+
+	SCM: Git
+
+	Repository URL: git@github.com:jbcristina/platforma-monitorizare.git
+
+	Credentials: jenkins
+
+	Branch: */main
+
+	Script Path: jenkins/pipelines/monitoring/Jenkinsfile
+6. Click Save și Build Now
+
+### Configurare Jenkins
+
+#### Creează user `monitoring-user` cu acces limitat
+1. Manage Jenkins --> Manage and Assign Roles --> Manage Roles.
+2. Creează un rol nou: `platforma-monitorizare`
+3. Permisiuni minime: 
+    Overall: Read
+    Job: Read, Build, Workspace, Discover
+    View: Read
+4. Assign Roles:
+    Atribuie userului `monitoring-user` acest rol.
+#### Creează view `SystemStateMonitor` care include doar joburile proiectului
+1. Mergi pe Dashboard (pagina principală Jenkins)
+2. Click pe “+ New View” sau accesează direct: http://localhost:8080/newView
+3. Completează:
+    View name: Platforma Monitorizare
+
+    Type: List View
+
+    Click OK
+
+### Rulare
+
+Pipeline-urile se declanșează automat la fiecare push în Git sau manual din Jenkins.
 
 ## Terraform și AWS
 - [Prerequiste]
@@ -272,7 +370,11 @@ flowchart TB
 
 
 ## Resurse
-- [Listati aici orice link catre o resursa externa il considerti relevant]
-- Exemplu de URL:
 - [Sintaxa Markdown](https://www.markdownguide.org/cheat-sheet/)
 - [Schelet Proiect](https://github.com/amihai/platforma-monitorizare)
+- [Documentația oficială Jenkins](https://www.jenkins.io/doc/)
+- [Docker oficial](https://docs.docker.com/)
+- [Documentația oficială Ansible](https://docs.ansible.com/ansible/latest/index.html)
+- [Documentația oficială Python 3](https://docs.python.org/3/)
+- [Documentația oficială Git & GitHub](https://git-scm.com/doc)
+

@@ -5,7 +5,7 @@
   become: true
 
   vars:
-    remote_project_path: "/home/ansible/platforma-monitorizare"
+    remote_project_path: "/home/ansible2/platforma-monitorizare"
     compose_folder: "{{ remote_project_path }}/docker"
     compose_file: "{{ compose_folder }}/compose.yaml"
     backup_dir: "{{ remote_project_path }}/scripts/backup"
@@ -15,7 +15,7 @@
       file:
         path: "{{ remote_project_path }}"
         state: directory
-        owner: ansible
+        owner: ansible2
         mode: '0755'
 
     - name: Copiază proiectul local pe mașina remote
@@ -35,7 +35,7 @@
       file:
         path: "{{ backup_dir }}"
         state: directory
-        owner: ansible
+        owner: ansible2
         mode: '0755'
 
     - name: Verifică dacă folderul docker există
