@@ -1,0 +1,15 @@
+# Ignoră fișierul .env
+.env
+
+# Ignoră toate fișierele .log
+*.log
+
+# Ignoră directorul backup/
+backup/
+
+# Ignoră fișierele temporare
+*.tmp
+
+# Ignoră fișierele generate de Python
+__pycache__/
+*.pyc
