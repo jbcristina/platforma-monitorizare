@@ -35,6 +35,12 @@
         state: present
         update_cache: yes
 
+    - name: Adaugă utilizatorul ansible2 în grupul docker
+      user:
+        name: ansible2
+        groups: docker
+        append: yes
+
     - name: Verifică instalarea Docker
       command: docker --version
       register: docker_version

@@ -93,3 +93,13 @@
           {% else %}
             Nu s-au detectat fișiere de backup în scripts/backup.
           {% endif %}
+
+    - name: Afișează logurile din containerul monitorizare
+      shell: docker logs $(docker ps --filter "name=monitor" --format "{{ '{{' }}.Names{{ '}}' }}")
+      register: monitor_logs
+      changed_when: false
+      ignore_errors: true
+    
+    - name: Afișează outputul logurilor monitorizare
+      debug:
+        msg: "{{ monitor_logs.stdout_lines | default(['Nu s-au găsit loguri sau containerul nu rulează']) }}"

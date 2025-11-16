@@ -1,8 +1,21 @@
 
 # 🛠️ Platforma de Monitorizare a Starii unui Sistem
 
+## Clonare proiect
+
+Pentru a clona acest proiect creați propriul vostru repository EMPTY în GitHub și rulați pas cu pas comenzile de mai jos:
+```bash
+git clone git@git@git@github.com:jbcristina/platforma-monitorizare.git
+cd platforma-monitorizare
+git remote -v
+git remote remove origin
+git remote add origin git@github.com:<USERUL_VOSTRU>/platforma-monitorizare.git
+git branch -M main
+git push -u origin main
+```
+
 ## Scopul Proiectului
-Scopul acestui proiect este să monitorizeze în timp real starea unui sistem (mașină virtuală, container etc.) și să mențină o istorie a stărilor pentru analiză ulterioară. Aplicația colectează informații despre CPU, memorie, procese active, utilizare disk și alte date relevante, le salvează într-un fișier de log, iar un script Python face backup automat doar când apar modificări. Totul este containerizat, orchestrat în Kubernetes, automatizat cu Ansible și Terraform, și integrat într-un pipeline CI/CD cu Jenkins.
+Scopul acestui proiect este să monitorizeze în timp real starea unui sistem (mașină virtuală, container etc.) și să mențină o istorie a stărilor pentru analiză ulterioară. Aplicația colectează informații despre CPU, memorie, procese active, utilizare disk și alte date relevante, le salvează într-un fișier de log, iar un script Python face backup automat doar când apar modificări. Totul este containerizat, orchestrat în Kubernetes, automatizat cu Ansible și integrat într-un pipeline CI/CD cu Jenkins.
 
 ### Arhitectura proiectului
 Arhitectura include:
@@ -10,9 +23,7 @@ Arhitectura include:
 - Un container Nginx care expune fișierul de log
 - Orchestrare în Kubernetes cu HPA
 - Provisionare cu Ansible pe o mașină virtuală
-- Infrastructură creată cu Terraform (EC2, S3, SSH key)
-- CI/CD cu Jenkins și Docker Hub
-
+- CI/CD cu Jenkins
 
 
 ## Structura Proiectului
@@ -21,7 +32,7 @@ Arhitectura include:
 
 - `/scripts`: 
     - `monitoring.sh`: script shell care colectează date despre sistem (CPU, memorie, uptime, procese, disk).
-    - `backup.py`: script Python care face backup la fișierul de log dacă acesta s-a modificat
+    - `backup.py`: script Python care face backup la fișierul de log dacă acesta s-a modificat.
 
 - `/docker`: 
     - `monitoring/Dockerfile`: imagine Docker pentru scriptul de monitorizare
@@ -35,7 +46,7 @@ Arhitectura include:
 - `/ansible`:
     - `install_docker.yml`: instalează Docker pe o mașină virtuală.
     - `deploy_platform.yml`: rulează aplicația folosind docker-compose.yaml.
-    - `inventory.ini`: definește VM-urile țintă
+    - `inventory.ini`: definește VM-urile țintă.
 
 - `/jenkins/pipelines`:
     - `monitoring/Jenkinsfile`: pipeline CI/CD pentru scriptul shell.
@@ -48,23 +59,24 @@ Arhitectura include:
 
 ## Setup și Rulare
 
-🖥️ scripts/monitoring.sh
-- Suprascrie fișierul `system-state.log` la fiecare ciclu
-- Intervalul este configurabil cu `export MONITOR_INTERVAL=10`
+🖥️ `scripts/monitoring.sh`
+- Suprascrie fișierul `system-state.log` la fiecare ciclu;
+- Intervalul este configurabil cu `export MONITOR_INTERVAL=10`.
 
-💾 scripts/backup.py
-- Creează backup doar dacă fișierul s-a modificat
-- Numele backup-ului include data și ora
-- Directorul de backup este configurabil cu `export BACKUP_DIR=backup`
-- Logurile sunt clare și informative
-- Tratează toate excepțiile fără a se opri
+💾 `scripts/backup.py`
+- Creează backup doar dacă fișierul s-a modificat;
+- Numele backup-ului include data și ora;
+- Directorul de backup este configurabil cu `export BACKUP_DIR=backup`;
+- Logurile sunt clare și informative;
+- Tratează toate excepțiile fără a se opri.
 
 ⚙️ Variabile de mediu
+
 | Variabilă      | Descriere   | Valoare implicită                          |
 |:------------------|:--------:|-----------------------------------:|
 | MONITOR_INTERVAL     | Intervalul de monitorizare în secunde     | 5 |
-| BACKUP_INTERVAL      | ntervalul de verificare pentru backup   | 5     |
-| BACKUP_DIR         | irectorul unde se salvează backup-urile   | backup    |
+| BACKUP_INTERVAL      | Intervalul de verificare pentru backup   | 5     |
+| BACKUP_DIR         | Directorul unde se salvează backup-urile   | backup    |
 
 Se pot suprascrie cu:
 ```bash
@@ -92,6 +104,7 @@ python3 scripts/backup.py
 # Build:
 cd /home/cris/work/platforma-monitorizare
 docker build -t monitorizare -f docker/monitoring/Dockerfile .
+
 #Testare individuala:
 docker run --rm -e MONITORING_INTERVAL=5 -v "$(pwd)/scripts:/scripts" monitorizare
 docker exec -it monitorizare sh
@@ -103,6 +116,7 @@ Se verifică fișierul scripts/system-state.log — ar trebui să fie suprascris
 # Build:
 cd /home/cris/work/platforma-monitorizare
 docker build -t backup -f docker/backup/Dockerfile .
+
 #Testare individuala:
 docker run --rm -e INTERVAL=5 -e BACKUP_DIR=scripts/backup -e MAX_BACKUPS=10 -v "$(pwd)/scripts:/scripts" backup
 docker exec -it backup sh
@@ -117,17 +131,20 @@ Logurile din terminal confirmă acțiunile: detectare modificare, creare backup,
 # Build:
 cd /home/cris/work/platforma-monitorizare
 docker compose -f docker/compose.yaml up --build
+
 #Verificare loguri:
 Attaching to backup, monitorizare
-backup  | 2025-10-27 19:54:55,155 - INFO - Pornit script de backup cu interval de 5 secunde.
-backup  | 2025-10-27 19:54:55,155 - INFO - Pornit script de backup cu interval de 5 secunde.
-backup  | 2025-10-27 19:54:55,157 - INFO - Fișierul s-a modificat. Se face backup...
-backup  | 2025-10-27 19:54:55,157 - INFO - Backup creat: scripts/backup/system-state_20251027_195455.log
-backup  | 2025-10-27 19:54:55,157 - INFO - Fișierul s-a modificat. Se face backup...
-backup  | 2025-10-27 19:54:55,157 - INFO - Backup creat: scripts/backup/system-state_20251027_195455.log
+backup  | 2025-11-15 16:45:34,720 - INFO - Pornit script de backup cu interval de 5 secunde.
+backup  | 2025-11-15 16:45:34,721 - INFO - Fișierul s-a modificat. Se face backup...
+backup  | 2025-11-15 16:45:34,721 - INFO - Backup creat: scripts/backup/system-state_20251115_164534.log
+backup  | 2025-11-15 16:45:34,722 - INFO - Backup vechi șters: scripts/backup/system-state_20251115_164302.log
+monitorizare  | [INFO] Logul a fost scris cu succes în scripts/system-state.log
+backup        | 2025-11-15 16:45:39,731 - INFO - Fișierul s-a modificat. Se face backup...
+backup        | 2025-11-15 16:45:39,732 - INFO - Backup creat: scripts/backup/system-state_20251115_164539.log
+backup        | 2025-11-15 16:45:39,732 - INFO - Backup vechi șters: scripts/backup/system-state_20251115_164307.log
+monitorizare  | [INFO] Logul a fost scris cu succes în scripts/system-state.log
+backup        | 2025-11-15 16:45:44,737 - INFO - Fișierul s-a modificat. Se face backup...
 
-backup  | 2025-10-27 19:54:55,158 - INFO - Backup vechi șters: scripts/backup/system-state_20251027_184435.log
-backup  | 2025-10-27 19:55:00,164 - INFO - Fișierul s-a modificat. Se face backup...
 #Într-un alt terminal:
 docker exec -it backup sh
 / # tail -f scripts/system-state.log
@@ -188,8 +205,10 @@ ssh ansible2@192.168.2.126
 ### ✅ Verificare instalare Docker cu Ansible
 După rularea playbook-ului `ansible/playbooks/install_docker.yml`, verifică:
 ```bash
+cd /home/cris/work/platforma-monitorizare
 ansible-playbook -i ansible/inventory.ini ansible/playbooks/install_docker.yml
 ansible-playbook -i ansible/inventory.ini ansible/playbooks/deploy_platform.yml
+
 # Verifică dacă Docker este instalat
 docker --version
 # Verifică dacă serviciul Docker rulează
@@ -203,7 +222,7 @@ Dacă ansible2 apare în grupul docker, instalarea este completă.
 După rularea playbook-ului `ansible/playbooks/deploy_platform.yml`, verifică:
 ```bash
 # Verifică dacă fișierul compose a fost copiat
-ls -l /home/ansible2/compose.yaml
+ls -l /home/ansible2/platforma-monitorizare/docker/compose.yaml
 
 # Verifică dacă containerele rulează
 docker ps
@@ -230,13 +249,12 @@ vm                         : ok=13   changed=4    unreachable=0    failed=0    s
 
 ```
 
-
 ## Setup și Rulare in Kubernetes
 
 ### 🔹 Build imagini local în Minikube:
 ```bash
 minikube start
-eval $(minikube docker-env) #activeaza mediul Docker din Minikube
+eval $(minikube -p minikube docker-env) #activeaza mediul Docker din Minikube
 docker build -t monitorizare -f docker/monitoring/Dockerfile .
 docker build -t backup -f docker/backup/Dockerfile .
 #Imaginile sunt disponibile in contextul Minikube
@@ -285,6 +303,8 @@ Autoscalarea se face automat pe baza metricilor CPU și memorie.
 
 ## CI/CD și Automatizari
 
+![](/imagini/jenkins-logo.png)
+
 Proiectul include două pipeline-uri declarative, fiecare definit într-un `Jenkinsfile` și versionat în Git:
 
 ### 🔧 Pipeline-uri
@@ -313,6 +333,8 @@ Proiectul include două pipeline-uri declarative, fiecare definit într-un `Jenk
 	Script Path: jenkins/pipelines/backup/Jenkinsfile
 6. Click Save și Build Now
 
+![Imagine Pipeline Backup - Blue Ocean](/imagini/platforma-monitorizare-backup.jpg)
+
 ##### 🔹 1.2. platforma-monitorizare-monitoring
 1. În Jenkins --> Dashboard --> New Item
 2. Nume: platforma-monitorizare-monitoring
@@ -332,6 +354,9 @@ Proiectul include două pipeline-uri declarative, fiecare definit într-un `Jenk
 
 	Script Path: jenkins/pipelines/monitoring/Jenkinsfile
 6. Click Save și Build Now
+
+![Imagine Pipeline Monitoring - Blue Ocean](/imagini/platforma-monitorizare-monitoring.jpg)
+
 
 ### Configurare Jenkins
 
@@ -358,23 +383,15 @@ Proiectul include două pipeline-uri declarative, fiecare definit într-un `Jenk
 
 Pipeline-urile se declanșează automat la fiecare push în Git sau manual din Jenkins.
 
-## Terraform și AWS
-- [Prerequiste]
-- [Instrucțiuni pentru rularea Terraform și configurarea AWS]
-- [Daca o sa folositi pentru testare localstack in loc de AWS real puneti aici toti pasii pentru install localstack.]
-- [Adaugati instructiunile pentru ca verifica faptul ca Terraform a creat corect infrastructura]
-
-## Depanare si investigarea erorilor
-- [Descrieti cum putem accesa logurile aplicatiei si cum ne logam pe fiecare container pentru eventualele depanari de probleme]
-- [Descrieti cum ati gandit logurile (formatul logurilor, levelul de log)]
-
-
 ## Resurse
 - [Sintaxa Markdown](https://www.markdownguide.org/cheat-sheet/)
 - [Schelet Proiect](https://github.com/amihai/platforma-monitorizare)
-- [Documentația oficială Jenkins](https://www.jenkins.io/doc/)
+- [Git - Documentatie](https://git-scm.com/docs)
 - [Docker oficial](https://docs.docker.com/)
+- [Docker compose](https://docs.docker.com/compose/)
 - [Documentația oficială Ansible](https://docs.ansible.com/ansible/latest/index.html)
 - [Documentația oficială Python 3](https://docs.python.org/3/)
-- [Documentația oficială Git & GitHub](https://git-scm.com/doc)
+- [Documentația oficială Kuberbetes](https://kubernetes.io/docs/home/)
+- [Documentația oficială Minikube](https://minikube.sigs.k8s.io/docs/)
+- [Documentația oficială Jenkins](https://www.jenkins.io/doc/book/pipeline/syntax/)
 

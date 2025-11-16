@@ -1,35 +1,73 @@
-==================== STAREA SISTEMULUI ====================
-Data si ora: 2025-10-27 20:02:32
-Hostname: ec8adfc40140
-Uptime: up 3 hours, 3 minutes
-----------------------------------------
-Utilizare CPU:
-  User: 15.8%, System: 7.9%, Idle: 73.7%
-Media de incarcare: 0.82, 0.67, 0.43
-----------------------------------------
-Utilizare memorie:
-  Total: 5.6Gi, Used: 3.4Gi, Free: 297Mi
-  Swap Total: 2.0Gi, Used: 524Ki, Free: 2.0Gi
-----------------------------------------
-Utilizare disk:
-  Total: 49G, Used: 28G, Available: 19G, Usage: 61%
-----------------------------------------
-Utilizare retea:
-  Interfata: eth0
-  Primite: 3 KB, Transmise: 0 KB
-----------------------------------------
-Temperatura CPU:
-  Not available
-----------------------------------------
-Procese active: 4
-Top 5 procese ce consuma memorie:
-  PID: 2872, CMD: ps, MEM: 0.0%
-  PID: 1, CMD: bash, MEM: 0.0%
-  PID: 2874, CMD: awk, MEM: 0.0%
-  PID: 2873, CMD: bash, MEM: 0.0%
-----------------------------------------
-Utilizatori logati:
-----------------------------------------
-Servicii active (systemd):
-  systemctl nu este disponibil în acest mediu.
-=====================================================
+[INFO] ==================== STAREA SISTEMULUI ====================
+[INFO] Data si ora: 2025-11-15 20:30:34
+[INFO] Hostname: Ubuntu22042
+[INFO] Uptime: up 42 minutes
+[INFO] ----------------------------------------
+[INFO] Utilizare CPU:
+[INFO]   User: 14.9%, System: 12.2%, Idle: 71.6%
+[INFO] Media de incarcare: 3.30, 2.83, 2.55
+[INFO] ----------------------------------------
+[INFO] Utilizare memorie:
+[INFO]   Total: 5.6Gi, Used: 3.0Gi, Free: 144Mi
+[INFO]   Swap Total: 2.0Gi, Used: 538Mi, Free: 1.5Gi
+[INFO] ----------------------------------------
+[INFO] Utilizare disk:
+[INFO]   Total: 49G, Used: 27G, Available: 20G, Usage: 58%
+[INFO] ----------------------------------------
+[INFO] Utilizare retea:
+[WARN]   Interfața de rețea enp0s3
+enp0s8 nu este disponibilă sau nu are fișierele de statistică.
+[INFO] ----------------------------------------
+[INFO] Temperatura CPU:
+[INFO] ----------------------------------------
+[INFO] Procese active: 353
+[INFO] Top 5 procese ce consuma memorie:
+[INFO]   PID: 30290, CMD: firefox, MEM: 7.1%
+[INFO]   PID: 4075, CMD: code, MEM: 6.7%
+[INFO]   PID: 4102, CMD: code, MEM: 6.6%
+[INFO]   PID: 3435, CMD: gnome-shell, MEM: 6.6%
+[INFO]   PID: 2013, CMD: java, MEM: 5.2%
+[INFO] ----------------------------------------
+[INFO] Utilizatori logati:
+[INFO]   User: cris, Terminal: tty2, Login Time: 2025-11-15 19:53
+[INFO] ----------------------------------------
+[INFO] Servicii active (systemd):
+[INFO]   accounts-daemon.service
+[INFO]   acpid.service
+[INFO]   avahi-daemon.service
+[INFO]   colord.service
+[INFO]   containerd.service
+[INFO]   cron.service
+[INFO]   cups-browsed.service
+[INFO]   cups.service
+[INFO]   dbus.service
+[INFO]   docker.service
+[INFO]   gdm.service
+[INFO]   irqbalance.service
+[INFO]   kerneloops.service
+[INFO]   ModemManager.service
+[INFO]   networkd-dispatcher.service
+[INFO]   NetworkManager.service
+[INFO]   packagekit.service
+[INFO]   polkit.service
+[INFO]   power-profiles-daemon.service
+[INFO]   rsyslog.service
+[INFO]   rtkit-daemon.service
+[INFO]   snapd.service
+[INFO]   switcheroo-control.service
+[INFO]   systemd-journald.service
+[INFO]   systemd-logind.service
+[INFO]   systemd-oomd.service
+[INFO]   systemd-resolved.service
+[INFO]   systemd-timesyncd.service
+[INFO]   systemd-udevd.service
+[INFO]   udisks2.service
+[INFO]   unattended-upgrades.service
+[INFO]   upower.service
+[INFO]   user@1000.service
+[INFO]   wpa_supplicant.service
+[INFO]   LOAD
+[INFO]   ACTIVE
+[INFO]   SUB
+[INFO]   34
+[INFO] =====================================================

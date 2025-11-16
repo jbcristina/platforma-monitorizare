@@ -23,7 +23,7 @@ spec:
       containers:
         - name: monitorizare
           image: monitorizare:latest
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
           env:
             - name: MONITORING_INTERVAL
               value: "5"
@@ -33,7 +33,7 @@ spec:
 
         - name: backup
           image: backup:latest
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
           env:
             - name: INTERVAL
               value: "5"
@@ -47,7 +47,7 @@ spec:
 
         - name: nginx
           image: nginx:alpine
-          imagePullPolicy: Never
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
           volumeMounts:
