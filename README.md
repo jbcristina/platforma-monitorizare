@@ -199,7 +199,7 @@ service ssh status
 ip addr | grep 192.168
 
 # Revenim pe mașina client și încercăm să facem ssh cu userul ansible2
-ssh ansible2@192.168.2.126
+ssh ansible2@192.168.100.82
 
 ```
 ### ✅ Verificare instalare Docker cu Ansible
