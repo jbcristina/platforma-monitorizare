@@ -1,15 +1,15 @@
 [INFO] ==================== STAREA SISTEMULUI ====================
-[INFO] Data si ora: 2025-11-15 20:30:34
+[INFO] Data si ora: 2025-11-17 17:35:38
 [INFO] Hostname: Ubuntu22042
-[INFO] Uptime: up 42 minutes
+[INFO] Uptime: up 7 minutes
 [INFO] ----------------------------------------
 [INFO] Utilizare CPU:
-[INFO]   User: 14.9%, System: 12.2%, Idle: 71.6%
-[INFO] Media de incarcare: 3.30, 2.83, 2.55
+[INFO]   User: 25.7%, System: 15.7%, Idle: 51.4%
+[INFO] Media de incarcare: 0.62, 0.97, 0.56
 [INFO] ----------------------------------------
 [INFO] Utilizare memorie:
-[INFO]   Total: 5.6Gi, Used: 3.0Gi, Free: 144Mi
-[INFO]   Swap Total: 2.0Gi, Used: 538Mi, Free: 1.5Gi
+[INFO]   Total: 5.6Gi, Used: 2.3Gi, Free: 643Mi
+[INFO]   Swap Total: 2.0Gi, Used: 0B, Free: 2.0Gi
 [INFO] ----------------------------------------
 [INFO] Utilizare disk:
 [INFO]   Total: 49G, Used: 27G, Available: 20G, Usage: 58%
@@ -20,16 +20,16 @@ enp0s8 nu este disponibilă sau nu are fișierele de statistică.
 [INFO] ----------------------------------------
 [INFO] Temperatura CPU:
 [INFO] ----------------------------------------
-[INFO] Procese active: 353
+[INFO] Procese active: 243
 [INFO] Top 5 procese ce consuma memorie:
-[INFO]   PID: 30290, CMD: firefox, MEM: 7.1%
-[INFO]   PID: 4075, CMD: code, MEM: 6.7%
-[INFO]   PID: 4102, CMD: code, MEM: 6.6%
-[INFO]   PID: 3435, CMD: gnome-shell, MEM: 6.6%
-[INFO]   PID: 2013, CMD: java, MEM: 5.2%
+[INFO]   PID: 1905, CMD: java, MEM: 10.1%
+[INFO]   PID: 3320, CMD: gnome-shell, MEM: 8.2%
+[INFO]   PID: 4231, CMD: code, MEM: 7.7%
+[INFO]   PID: 4203, CMD: code, MEM: 5.7%
+[INFO]   PID: 4124, CMD: code, MEM: 3.1%
 [INFO] ----------------------------------------
 [INFO] Utilizatori logati:
-[INFO]   User: cris, Terminal: tty2, Login Time: 2025-11-15 19:53
+[INFO]   User: cris, Terminal: tty2, Login Time: 2025-11-17 17:29
 [INFO] ----------------------------------------
 [INFO] Servicii active (systemd):
 [INFO]   accounts-daemon.service
