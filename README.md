@@ -5,7 +5,7 @@
 
 Pentru a clona acest proiect creați propriul vostru repository EMPTY în GitHub și rulați pas cu pas comenzile de mai jos:
 ```bash
-git clone git@git@git@github.com:jbcristina/platforma-monitorizare.git
+git clone git@github.com:jbcristina/platforma-monitorizare.git
 cd platforma-monitorizare
 git remote -v
 git remote remove origin
